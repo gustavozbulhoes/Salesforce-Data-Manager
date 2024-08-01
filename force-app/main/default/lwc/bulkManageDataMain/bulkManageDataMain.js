@@ -85,8 +85,7 @@ export default class bulkManageDataMain extends LightningElement {
   async handleProcessRecords() {
     this.showSpinner = true;
     let records = this.data;
-    let chunkSize = this.chunkSize;
-    let chunks = this.chunkArray(records, chunkSize);
+    let chunks = this.chunkArray(records, this.chunkSize);
     try {
         let results = await this.processChunks(chunks);
         // Combine results and handle them
