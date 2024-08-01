@@ -1,82 +1,81 @@
 #Based on https://ci.salto.io/ && https://sfdx-hardis.cloudity.com/
 on:
-    pull_request:
-      branches: [ main ]
-      types: [closed]
-      paths:
-        - 'force-app/**'
-        
-  name: Deploy SFDX Hardis
-  
-  jobs:
-    prod_deploy:
-      runs-on: ubuntu-latest
-      if: github.event.pull_request.merged == true
-      name: Deployment to Major Org
-      permissions:
-        pull-requests: write
+  pull_request:
+    branches: [ main ]
+    types: [closed]
+    paths:
+      - 'force-app/**'
+
+name: Deploy SFDX Hardis
+jobs:
+  prod_deploy:
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.merged == true
+    name: Deployment to Major Org
+    permissions:
+      pull-requests: write
+    env:
+      SFDX_CLIENT_ID_MAIN: ${{ secrets.SFDX_CLIENT_ID_MAIN}}
+      SFDX_CLIENT_KEY_MAIN: ${{ secrets.SFDX_CLIENT_KEY_MAIN}}
+      SFDX_DEPLOY_WAIT_MINUTES: 120 # Override if necessary
+      SFDX_TEST_WAIT_MINUTES: 120 # Override if necessary
+      CI_COMMIT_REF_NAME: ${{ github.event.pull_request.base.ref }} # Defines the target branch of the PR
+      ORG_ALIAS: ${{ github.event.pull_request.base.ref }} # Defines the target branch of the PR
+      CONFIG_BRANCH: ${{ github.event.pull_request.base.ref }} # Defines the target branch of the PR
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      FORCE_COLOR: "1"
+    steps:
+    # Checkout repo
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0 # Faster code checkout fetching only latest commit
+    # Setup node
+    - name: Setup Node
+      uses: actions/setup-node@v3
+      with:
+        node-version: "18"
+    # tests to run
+    - name: 'Selecting Tests to Run from PR Body'
       env:
-        SFDX_CLIENT_ID_MAIN: ${{ secrets.SFDX_CLIENT_ID_MAIN}}
-        SFDX_CLIENT_KEY_MAIN: ${{ secrets.SFDX_CLIENT_KEY_MAIN}}
-        SFDX_DEPLOY_WAIT_MINUTES: 120 # Override if necessary
-        SFDX_TEST_WAIT_MINUTES: 120 # Override if necessary
-        CI_COMMIT_REF_NAME: ${{ github.event.pull_request.base.ref }} # Defines the target branch of the PR
-        ORG_ALIAS: ${{ github.event.pull_request.base.ref }} # Defines the target branch of the PR
-        CONFIG_BRANCH: ${{ github.event.pull_request.base.ref }} # Defines the target branch of the PR
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        FORCE_COLOR: "1"
-      steps:
-      # Checkout repo
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0 # Faster code checkout fetching only latest commit
-      # Setup node
-      - name: Setup Node
-        uses: actions/setup-node@v3
-        with:
-          node-version: "18"
-      # tests to run
-      - name: 'Selecting Tests to Run from PR Body'
-        env:
-          PR_BODY: ${{github.event.pull_request.body}}´
-        run: |
-          echo $PR_BODY > ./pr_body.txt
-          node ./parsePR.js   
-          cat testsToRun.txt           
-          TESTS=$(cat testsToRun.txt)       
-          echo "APEX_TESTS=$TESTS" >> $GITHUB_ENV    
-      # SFDX & plugins
-      - name: Install SFDX and plugins
-        run: |
-          npm install --no-cache @salesforce/cli --global
-          echo 'y' | sfdx plugins:install sfdx-git-delta
-          echo 'y' | sfdx plugins:install sfdx-hardis
-      # Calculate delta and set package.xml = delta.xml to deploy only delta changes
-      - name: Configure delta changes for sfdx-hardis and Destructives
-        run: |
-          mkdir changed-sources
-          sfdx sgd:source:delta --to "HEAD" --from "HEAD^" --output changed-sources/ --generate-delta --source force-app/
-          echo $(cat changed-sources/package/package.xml) > manifest/package.xml
-          DESTRUCTIVE=$(cat changed-sources/destructiveChanges/destructiveChanges.xml | tr -d '[:space:]''?'\''/\\')       
-          echo "DESTRUCTIVE_PACKAGE=$DESTRUCTIVE" >> $GITHUB_ENV
-      #login
-      - name: Salesforce Authentication
-        run:
-          sfdx hardis:auth:login
-      # Deploy runnning All Tests
-      - name: Deploy delta - All Tests
-        if: ${{env.APEX_TESTS == 'all'}}
-        run:
-          sfdx hardis:project:deploy:sources:dx
-      # Deploy runnning Selected Tests
-      - name: Deploy delta - Selected Tests
-        if: ${{env.APEX_TESTS != 'all'}}
-        run:
-          sfdx hardis:project:deploy:sources:dx -l RunSpecifiedTests -r ${{env.APEX_TESTS}}
-      # Separate async destructive deploy   
-      - name: 'Deploy destructive changes (if any)'
-        if: contains(env.DESTRUCTIVE_PACKAGE, '<types>')
-        run: |
-          cat changed-sources/destructiveChanges/destructiveChanges.xml
-          sfdx force:mdapi:deploy -d "changed-sources/destructiveChanges" --ignorewarnings
+        PR_BODY: ${{github.event.pull_request.body}}´
+      run: |
+        echo $PR_BODY > ./pr_body.txt
+        node ./parsePR.js   
+        cat testsToRun.txt           
+        TESTS=$(cat testsToRun.txt)       
+        echo "APEX_TESTS=$TESTS" >> $GITHUB_ENV    
+    # SFDX & plugins
+    - name: Install SFDX and plugins
+      run: |
+        npm install --no-cache @salesforce/cli --global
+        echo 'y' | sfdx plugins:install sfdx-git-delta
+        echo 'y' | sfdx plugins:install sfdx-hardis
+    # Calculate delta and set package.xml = delta.xml to deploy only delta changes
+    - name: Configure delta changes for sfdx-hardis and Destructives
+      run: |
+        mkdir changed-sources
+        sfdx sgd:source:delta --to "HEAD" --from "HEAD^" --output changed-sources/ --generate-delta --source force-app/
+        echo $(cat changed-sources/package/package.xml) > manifest/package.xml
+        DESTRUCTIVE=$(cat changed-sources/destructiveChanges/destructiveChanges.xml | tr -d '[:space:]''?'\''/\\')       
+        echo "DESTRUCTIVE_PACKAGE=$DESTRUCTIVE" >> $GITHUB_ENV
+    #login
+    - name: Salesforce Authentication
+      run:
+        sfdx hardis:auth:login
+    # Deploy runnning All Tests
+    - name: Deploy delta - All Tests
+      if: ${{env.APEX_TESTS == 'all'}}
+      run:
+        sfdx hardis:project:deploy:sources:dx
+    # Deploy runnning Selected Tests
+    - name: Deploy delta - Selected Tests
+      if: ${{env.APEX_TESTS != 'all'}}
+      run:
+        sfdx hardis:project:deploy:sources:dx -l RunSpecifiedTests -r ${{env.APEX_TESTS}}
+    # Separate async destructive deploy   
+    - name: 'Deploy destructive changes (if any)'
+      if: contains(env.DESTRUCTIVE_PACKAGE, '<types>')
+      run: |
+        cat changed-sources/destructiveChanges/destructiveChanges.xml
+        sfdx force:mdapi:deploy -d "changed-sources/destructiveChanges" --ignorewarnings
