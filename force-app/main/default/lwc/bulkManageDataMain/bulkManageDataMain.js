@@ -85,7 +85,7 @@ export default class bulkManageDataMain extends LightningElement {
   async handleProcessRecords() {
     this.showSpinner = true;
     let records = this.data;
-    let chunkSize = this.chunkSize; // Assuming chunkSize is defined by the user input
+    let chunkSize = this.chunkSize;
     let chunks = this.chunkArray(records, chunkSize);
     try {
         let results = await this.processChunks(chunks);
@@ -111,14 +111,12 @@ export default class bulkManageDataMain extends LightningElement {
 
   async processChunks(chunks) {
     let results = [];
-    let index = 0;
     for (let chunk of chunks) {
         chunk.forEach(record => { record.sobjectType = this.objectName });
         let result = await processRecords({ objects: chunk, operationType: this.operationType, fields: this.fields })
         results.push(result.records);
         this.successes.push(...result.successes);
         this.failures.push(...result.failures);
-        index++;
     }
     return results;
   }
@@ -128,7 +126,6 @@ export default class bulkManageDataMain extends LightningElement {
   }
 
   includeResultInDataTable(result){
-    console.log('result',JSON.stringify(result));
     this.fields = this.getAllProperties(result);
     this.fields.push('_result');
     this.columns =  this.fields.map((value) => ({ fieldName: value, label: value }))
