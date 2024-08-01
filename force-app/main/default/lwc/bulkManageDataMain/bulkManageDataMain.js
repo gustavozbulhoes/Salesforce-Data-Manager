@@ -2,6 +2,7 @@
 
 import { LightningElement, wire } from 'lwc';
 import processRecords from '@salesforce/apex/BulkManageDataController.processRecords';
+import {csvStringToArray,chunkArray} from './utils.js'
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 
 export default class bulkManageDataMain extends LightningElement {
@@ -31,27 +32,10 @@ export default class bulkManageDataMain extends LightningElement {
   }
 
   handlePaste(event) {
-    let csvData = this.csvStringToArray(event.clipboardData.getData('text/plain'))
+    let csvData = csvStringToArray(event.clipboardData.getData('text/plain'))
     this.fields = csvData.splice(0, 1)[0];
     this.columns =  this.fields.map((value) => ({ fieldName: value, label: value }))
     this.data = csvData.map(row => row.reduce((p,v,i) => (p[this.columns[i].fieldName] = v, p), {}))
-  }
-  csvStringToArray(str) {
-    var arr = [];
-    var quote = false;
-    for (var row = 0, col = 0, c = 0; c < str.length; c++) {
-        var cc = str[c], nc = str[c+1];
-        arr[row] = arr[row] || [];
-        arr[row][col] = arr[row][col] || '';
-        if (cc == '"' && quote && nc == '"') { arr[row][col] += cc; ++c; continue; }
-        if (cc == '"') { quote = !quote; continue; }
-        if (cc == '\t' && !quote) { ++col; continue; }
-        if (cc == '\r' && nc == '\n' && !quote) { ++row; col = 0; ++c; continue; }
-        if (cc == '\n' && !quote) { ++row; col = 0; continue; }
-        if (cc == '\r' && !quote) { ++row; col = 0; continue; }
-        arr[row][col] += cc;
-    }
-    return arr;
   }
 
   //HANDLE OPERATION
@@ -84,13 +68,10 @@ export default class bulkManageDataMain extends LightningElement {
 
   async handleProcessRecords() {
     this.showSpinner = true;
-    let records = this.data;
-    let chunks = this.chunkArray(records, this.chunkSize);
+    let chunks = chunkArray(this.data, this.chunkSize);
     try {
         let results = await this.processChunks(chunks);
-        // Combine results and handle them
-        let combinedResult = results.flat();
-        this.includeResultInDataTable(combinedResult);
+        this.includeResultInDataTable(results.flat()); // Combine results and handle them
         this.finished = true;
         this.showSpinner = false;
     } catch (error) {
@@ -98,14 +79,6 @@ export default class bulkManageDataMain extends LightningElement {
         this.showToast('Error processing records', JSON.stringify(error), 'error', 'dismissable');
         this.showSpinner = false;
     }
-  }
-
-  chunkArray(array, size) {
-    let result = [];
-    for (let i = 0; i < array.length; i += size) {
-        result.push(array.slice(i, i + size));
-    }
-    return result;
   }
 
   async processChunks(chunks) {
@@ -178,7 +151,6 @@ export default class bulkManageDataMain extends LightningElement {
     this.successes = [];
     this.failures = [];
   }
-
 
   showToast(title, message, variant, mode) {
     const evt = new ShowToastEvent({
