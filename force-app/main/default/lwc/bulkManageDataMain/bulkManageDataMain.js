@@ -98,7 +98,9 @@ export default class bulkManageDataMain extends LightningElement {
   }
 
   includeResultInDataTable(result){
-    this.fields = this.getAllProperties(result);
+    if(!this.fields.includes('Id')){
+      this.fields.push('Id');
+    }
     this.fields.push('_result');
     this.columns =  this.fields.map((value) => ({ fieldName: value, label: value }))
     this.data = result;
@@ -112,19 +114,6 @@ export default class bulkManageDataMain extends LightningElement {
             errorIndex++;
         }
     } );
-  }
-
-  getAllProperties(objects) {
-    let properties = new Set();
-    objects.forEach(obj => {Object.keys(obj).forEach(key => {
-            if (key !== 'Id') {
-                properties.add(key);
-            }
-        });
-    });
-    let result = Array.from(properties);
-    result.push('Id'); // Add 'Id' at the end
-    return result;
   }
 
   copyToClipboard() {

@@ -20,22 +20,13 @@ public with sharing class BulkManageDataController {
             }
         }
 
-        if (!fields.contains('Id')) {
-            fields.add('Id');
-        }
-
         result.records = objects;
-        result.fields = fields;
-
         return result;
     }
 
     public class CSVToSObjectWrapper {
         @AuraEnabled
         public List<SObject> records { get; set; }
-
-        @AuraEnabled
-        public List<String> fields { get; set; }
 
         @AuraEnabled
         public List<Id> successes { get; set; }
