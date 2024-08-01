@@ -1,0 +1,42 @@
+<template>
+	<!-- Spinner -->
+	<template lwc:if={showSpinner}>
+		<lightning-spinner alternative-text="Loading" size="medium" class="spinnerClass"></lightning-spinner>
+	</template>
+	
+	<lightning-card title="Bulk Manage Records By Pasting Data from Excel">
+		<template lwc:if={data}>
+			<form class="slds-p-around_medium slds-card">
+				<lightning-layout multiple-rows>
+					<lightning-layout-item size="3" class="slds-var-p-around_xx-small">
+						<lightning-combobox name="Object" label="Object" value={objectName} placeholder="Select Object" options={objects} onchange={handleObjectChange} disabled={finished}></lightning-combobox>
+					</lightning-layout-item>
+					<lightning-layout-item size="3" class="slds-var-p-around_xx-small">
+						<lightning-combobox name="OperationType" label="Operation" value={operationType} placeholder="Select Operation Type" options={operations} onchange={handleOperationChange} disabled={finished} ></lightning-combobox>
+					</lightning-layout-item>
+					<lightning-layout-item size="1" class="slds-var-p-around_xx-small">
+						<lightning-input disabled={finished} type="number" label="Cunk Size" name="chunkSize" max="200" min="1" formatter="number" step="1" value={chunkSize} required field-level-help="Define the number of records that will be processed in each batch when handling large datasets. This is particularly useful to avoid hitting limits or timeouts when working with a large number of records in Salesforce."  onchange={changeChunkSizeHandler}></lightning-input>
+					</lightning-layout-item>
+					<lightning-layout-item size="1" class="slds-var-p-around_xx-small slds-var-m-top_large">
+						<lightning-button label="Process Records" disabled={disableProcessRecords} onclick={handleProcessRecords} variant="brand"></lightning-button>
+					</lightning-layout-item>
+					<lightning-layout-item size="2" class="slds-var-p-around_xx-small slds-var-m-top_large">
+						<template lwc:if={finished}>
+							<lightning-button label="Copy" icon-name="utility:copy" onclick={copyToClipboard} class="slds-var-m-left_x-small"></lightning-button>
+							<lightning-button label="Refresh" icon-name="utility:refresh" onclick={refresh} class="slds-var-m-left_x-small"></lightning-button>
+						</template>
+					</lightning-layout-item>
+				</lightning-layout>
+			 </form>
+		</template>
+		 <template lwc:else>
+			<p class="slds-m-around_large">
+				<lightning-icon icon-name='utility:paste' alternative-text='paste' variant='error' size='medium' title='paste'></lightning-icon><b>PASTE DATA</b></p>
+			</p>
+		</template>
+    </lightning-card>
+
+	<br/><br/>
+
+	<lightning-datatable hide-checkbox-column="true" data={data} columns={columns} key-field="value"></lightning-datatable>
+</template>
