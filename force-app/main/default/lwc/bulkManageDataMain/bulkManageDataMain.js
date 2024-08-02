@@ -53,6 +53,10 @@ export default class bulkManageDataMain extends LightningElement {
       ];
   }
 
+  get processRecordsButtonLabel() {
+    return this.operationType || '';
+  }
+  
   get disableProcessRecords(){
      return !this.fields || !this.objectName || !this.operationType || !this.data || this.finished || this.chunkSize < 1 || this.chunkSize > 200;
   }
