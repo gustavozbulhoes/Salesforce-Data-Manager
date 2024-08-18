@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>Allowed_Operations__c</fullName>
-    <externalId>false</externalId>
     <label>Allowed Operations</label>
     <required>true</required>
     <trackHistory>false</trackHistory>
@@ -20,11 +19,6 @@
                 <fullName>Update</fullName>
                 <default>false</default>
                 <label>Update</label>
-            </value>
-            <value>
-                <fullName>Delete</fullName>
-                <default>false</default>
-                <label>Delete</label>
             </value>
         </valueSetDefinition>
     </valueSet>
