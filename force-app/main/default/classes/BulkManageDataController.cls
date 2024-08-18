@@ -26,7 +26,6 @@ public with sharing class BulkManageDataController {
 
     @AuraEnabled(cacheable=true)
     public static List<AllowedObjectAndOperation> getAllowedObjectsAndOperations(Id userId){
-        system.debug('userId --> ' + userId);
         Map<String,Set<String>> getOperationsFromObjectName = BulkManageDataAction.getAllowedObjectsAndOperationsMap(userId);
         List<AllowedObjectAndOperation> result = new List<AllowedObjectAndOperation>();
         for(String objectName:getOperationsFromObjectName.keySet()){
@@ -35,7 +34,6 @@ public with sharing class BulkManageDataController {
             allowedObjectOperation.operations = getOperationsFromObjectName.get(objectName);
             result.add(allowedObjectOperation);
         }
-        system.debug('result --> ' + result);
         return result;
     }
 
