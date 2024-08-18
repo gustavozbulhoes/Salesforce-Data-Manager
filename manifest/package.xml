@@ -1,24 +1,32 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Package xmlns="http://soap.sforce.com/2006/04/metadata">
 	<types>
-		<members>*</members>
+		<members>BulkManageDataController</members>
+		<members>BulkManageDataControllerTest</members>
 		<name>ApexClass</name>
 	</types>
 	<types>
-		<members>*</members>
-		<name>AuraDefinitionBundle</name>
+		<members>Manage_Data_Object__c.Allowed_Operations__c</members>
+		<members>Manage_Data_Object__c.Manage_Data_Group__c</members>
+		<members>Manage_Data_Users__c.Group__c</members>
+		<members>Manage_Data_Users__c.User__c</members>
+		<name>CustomField</name>
 	</types>
 	<types>
-		<members>*</members>
-		<name>LightningComponentBundle</name>
+		<members>Manage_Data_Object__c</members>
+		<members>Manage_Data_Users__c</members>
+		<name>CustomObject</name>
 	</types>
 	<types>
-		<members>*</members>
-		<name>LightningExperienceTheme</name>
+		<members>Bulk_Manage_Data</members>
+		<members>Manage_Data_Group__c</members>
+		<name>CustomTab</name>
 	</types>
 	<types>
-		<members>*</members>
-		<name>LightningMessageChannel</name>
+		<members>Manage_Data_Group__c-Manage Data Group Layout</members>
+		<members>Manage_Data_Object__c-Manage Data Object Layout</members>
+		<members>Manage_Data_Users__c-Manage Data User Layout</members>
+		<name>Layout</name>
 	</types>
 	<version>60.0</version>
 </Package>

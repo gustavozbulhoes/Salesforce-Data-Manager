@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Manage_Data_Group__c</fullName>
+    <deleteConstraint>Restrict</deleteConstraint>
+    <externalId>false</externalId>
+    <label>Manage Data Group</label>
+    <referenceTo>Manage_Data_Group__c</referenceTo>
+    <relationshipLabel>Manage Data Objects</relationshipLabel>
+    <relationshipName>Manage_Data_Objects</relationshipName>
+    <required>true</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

@@ -24,6 +24,19 @@ public with sharing class BulkManageDataController {
         return result;
     }
 
+    @AuraEnabled(cacheable=true)
+    public static List<AllowedObjectAndOperation> getAllowedObjectsAndOperations(Id userId){
+        Map<String,Set<String>> getOperationsFromObjectName = BulkManageDataAction.getAllowedObjectsAndOperationsMap(userId);
+        List<AllowedObjectAndOperation> result = new List<AllowedObjectAndOperation>();
+        for(String objectName:getOperationsFromObjectName.keySet()){
+            AllowedObjectAndOperation allowedObjectOperation = new AllowedObjectAndOperation();
+            allowedObjectOperation.objectName = objectName;
+            allowedObjectOperation.operations = getOperationsFromObjectName.get(objectName);
+            result.add(allowedObjectOperation);
+        }
+        return result;
+    }
+
     public class CSVToSObjectWrapper {
         @AuraEnabled
         public List<SObject> records { get; set; }
@@ -33,5 +46,12 @@ public with sharing class BulkManageDataController {
 
         @AuraEnabled
         public List<String> failures { get; set; }
+    }
+
+    public class AllowedObjectAndOperation {
+        @AuraEnabled
+        public String objectName { get; set; }
+        @AuraEnabled
+        public Set<String> operations { get; set; }
     }
 }

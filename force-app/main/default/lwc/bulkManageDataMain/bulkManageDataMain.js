@@ -1,7 +1,9 @@
 //Based on https://salesforce.stackexchange.com/questions/366322/how-to-copy-data-from-excel-to-lwc-lightning-datatable
 
-import { LightningElement, wire } from 'lwc';
+import { LightningElement, wire, track } from 'lwc';
 import processRecords from '@salesforce/apex/BulkManageDataController.processRecords';
+import getAllowedObjectsAndOperations from '@salesforce/apex/BulkManageDataController.getAllowedObjectsAndOperations';
+import userId from "@salesforce/user/Id";
 import {csvStringToArray,chunkArray} from './utils.js'
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 
@@ -13,6 +15,8 @@ export default class bulkManageDataMain extends LightningElement {
   fields
   columns = []
 
+  userId = userId
+
   chunkSize = 200;
   successes = []
   failures = []
@@ -21,6 +25,11 @@ export default class bulkManageDataMain extends LightningElement {
   operationType;
   showSpinner = false;
   finished = false;
+
+  @track objectOptions = [];
+  @track operationOptions = [];
+  allowedOperationsMap = new Map();
+
 
   //HANDLE PASTE
   connectedCallback() {
@@ -39,18 +48,27 @@ export default class bulkManageDataMain extends LightningElement {
   }
 
   //HANDLE OPERATION
-  get objects() {
-    return [
-        { label: 'Opportunity', value: 'Opportunity' },
-        { label: 'Account', value: 'Account' },
-    ];
-  }
 
-  get operations() {
-      return [
-          { label: 'Insert', value: 'Insert' },
-          { label: 'Update', value: 'Update' },
-      ];
+  //get permissions  
+  @wire(getAllowedObjectsAndOperations, {userId: '$userId'})
+  wiredData({ data, error }) {
+      if (data) {
+          // Ensure data is iterable and each item has defined operations
+          try {
+            this.objectOptions = data.map(item => ({ label: item.objectName, value: item.objectName })).sort((a, b) => a.label.localeCompare(b.label));
+              data.forEach(item => {
+                if (item.operations) {
+                    this.allowedOperationsMap.set(item.objectName, Array.from(item.operations));
+                } else {
+                    console.warn(`No operations defined for ${item.objectName}`);
+                }
+            });
+          } catch (err) {
+              console.error('Error processing data:', err);
+          }
+      } else if (error) {
+          console.error('Apex error:', error);
+      }
   }
 
   get processRecordsButtonLabel() {
@@ -64,6 +82,10 @@ export default class bulkManageDataMain extends LightningElement {
   handleObjectChange(event){
     this.objectName = event.detail.value;
     this.operationType = null;
+    this.operationOptions = this.allowedOperationsMap.get(this.objectName).map(op => ({
+      label: op,
+      value: op
+  }));
   }
 
   handleOperationChange(event){
