@@ -3,7 +3,7 @@
 import { LightningElement, wire, track } from 'lwc';
 import processRecords from '@salesforce/apex/BulkManageDataController.processRecords';
 import getAllowedObjectsAndOperations from '@salesforce/apex/BulkManageDataController.getAllowedObjectsAndOperations';
-import Id from "@salesforce/user/Id";
+import userId from "@salesforce/user/Id";
 import {csvStringToArray,chunkArray} from './utils.js'
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 
@@ -15,7 +15,7 @@ export default class bulkManageDataMain extends LightningElement {
   fields
   columns = []
 
-  userId = Id
+  userId = userId
 
   chunkSize = 200;
   successes = []
@@ -50,8 +50,8 @@ export default class bulkManageDataMain extends LightningElement {
   //HANDLE OPERATION
 
   //get permissions  
-  @wire(getAllowedObjectsAndOperations)
-  wiredData({ error, data }) {
+  @wire(getAllowedObjectsAndOperations, {userId: '$userId'})
+  wiredData({ data, error }) {
       if (data) {
           // Ensure data is iterable and each item has defined operations
           try {
@@ -59,7 +59,6 @@ export default class bulkManageDataMain extends LightningElement {
                   label: item.objectName,
                   value: item.objectName
               }));
-              
               data.forEach(item => {
                   if (item.operations) {
                       this.allowedOperationsMap.set(item.objectName, Array.from(item.operations));

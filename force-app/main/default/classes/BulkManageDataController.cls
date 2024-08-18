@@ -49,7 +49,9 @@ public with sharing class BulkManageDataController {
     }
 
     public class AllowedObjectAndOperation {
+        @AuraEnabled
         public String objectName { get; set; }
+        @AuraEnabled
         public Set<String> operations { get; set; }
     }
 }
