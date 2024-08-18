@@ -55,17 +55,14 @@ export default class bulkManageDataMain extends LightningElement {
       if (data) {
           // Ensure data is iterable and each item has defined operations
           try {
-              this.objectOptions = data.map(item => ({
-                  label: item.objectName,
-                  value: item.objectName
-              }));
+            this.objectOptions = data.map(item => ({ label: item.objectName, value: item.objectName })).sort((a, b) => a.label.localeCompare(b.label));
               data.forEach(item => {
-                  if (item.operations) {
-                      this.allowedOperationsMap.set(item.objectName, Array.from(item.operations));
-                  } else {
-                      console.warn(`No operations defined for ${item.objectName}`);
-                  }
-              });
+                if (item.operations) {
+                    this.allowedOperationsMap.set(item.objectName, Array.from(item.operations));
+                } else {
+                    console.warn(`No operations defined for ${item.objectName}`);
+                }
+            });
           } catch (err) {
               console.error('Error processing data:', err);
           }
@@ -73,20 +70,6 @@ export default class bulkManageDataMain extends LightningElement {
           console.error('Apex error:', error);
       }
   }
-
-  /*get objects() {
-    return [
-        { label: 'Opportunity', value: 'Opportunity' },
-        { label: 'Account', value: 'Account' },
-    ];
-  }
-
-  get operations() {
-      return [
-          { label: 'Insert', value: 'Insert' },
-          { label: 'Update', value: 'Update' },
-      ];
-  }*/
 
   get processRecordsButtonLabel() {
     return this.operationType || '';
