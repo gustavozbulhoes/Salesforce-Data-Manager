@@ -49,7 +49,7 @@
     </tabSettings>
     <tabSettings>
         <tab>Manage_Data_Group__c</tab>
-        <visibility>Available</visibility>
+        <visibility>Visible</visibility>
     </tabSettings>
     <tabSettings>
         <tab>My_Settings</tab>
