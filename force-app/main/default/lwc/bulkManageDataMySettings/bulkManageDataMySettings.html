@@ -1,0 +1,6 @@
+<template>
+    <lightning-card variant="Narrow" title="Settings" icon-name="utility:settings">
+        <p class="slds-p-horizontal_small">{message}</p>
+    </lightning-card>
+    <lightning-datatable hide-checkbox-column="true" data={data} columns={columns} key-field="objectName"></lightning-datatable>
+</template>
