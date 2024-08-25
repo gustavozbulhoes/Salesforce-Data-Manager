@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <applicationVisibilities>
+        <application>Data_Manager</application>
+        <visible>true</visible>
+    </applicationVisibilities>
     <classAccesses>
         <apexClass>BulkManageDataController</apexClass>
         <enabled>true</enabled>
@@ -46,5 +50,9 @@
     <tabSettings>
         <tab>Manage_Data_Group__c</tab>
         <visibility>Available</visibility>
+    </tabSettings>
+    <tabSettings>
+        <tab>My_Settings</tab>
+        <visibility>Visible</visibility>
     </tabSettings>
 </PermissionSet>
