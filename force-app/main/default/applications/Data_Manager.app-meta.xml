@@ -16,5 +16,4 @@
     <tabs>Manage_Data_Group__c</tabs>
     <tabs>My_Settings</tabs>
     <uiType>Lightning</uiType>
-    <utilityBar>Data_Manager_UtilityBar</utilityBar>
 </CustomApplication>
