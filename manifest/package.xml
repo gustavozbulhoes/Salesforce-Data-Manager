@@ -6,6 +6,10 @@
 		<name>ApexClass</name>
 	</types>
 	<types>
+		<members>Data_Manager</members>
+		<name>CustomApplication</name>
+	</types>
+	<types>
 		<members>Manage_Data_Object__c.Allowed_Operations__c</members>
 		<members>Manage_Data_Object__c.Manage_Data_Group__c</members>
 		<members>Manage_Data_Users__c.Group__c</members>
@@ -20,6 +24,7 @@
 	<types>
 		<members>Bulk_Manage_Data</members>
 		<members>Manage_Data_Group__c</members>
+		<members>My_Settings</members>
 		<name>CustomTab</name>
 	</types>
 	<types>
@@ -29,8 +34,13 @@
 		<name>Layout</name>
 	</types>
 	<types>
-		<members>Data_Manager_User</members>
+		<members>bulkManageDataMain</members>
+		<members>bulkManageDataMySettings</members>
+		<name>LightningComponentBundle</name>
+	</types>
+	<types>
 		<members>Data_Manager_Admin</members>
+		<members>Data_Manager_User</members>
 		<name>PermissionSet</name>
 	</types>
 	<version>60.0</version>
