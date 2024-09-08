@@ -3,6 +3,7 @@
 	<types>
 		<members>BulkManageDataController</members>
 		<members>BulkManageDataControllerTest</members>
+		<members>BulkManageDataAction</members>
 		<name>ApexClass</name>
 	</types>
 	<types>
@@ -19,6 +20,7 @@
 	<types>
 		<members>Manage_Data_Object__c</members>
 		<members>Manage_Data_Users__c</members>
+		<members>Manage_Data_Group__c</members>
 		<name>CustomObject</name>
 	</types>
 	<types>
