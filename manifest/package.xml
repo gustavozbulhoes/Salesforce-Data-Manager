@@ -28,6 +28,10 @@
 		<name>CustomTab</name>
 	</types>
 	<types>
+		<members>Manage_Data_Group_Record_Page</members>
+		<name>FlexiPage</name>
+	</types>
+	<types>
 		<members>Manage_Data_Group__c-Manage Data Group Layout</members>
 		<members>Manage_Data_Object__c-Manage Data Object Layout</members>
 		<members>Manage_Data_Users__c-Manage Data User Layout</members>
@@ -37,6 +41,10 @@
 		<members>bulkManageDataMain</members>
 		<members>bulkManageDataMySettings</members>
 		<name>LightningComponentBundle</name>
+	</types>
+	<types>
+		<members>Manage_Data_Group__c.All_Groups</members>
+		<name>ListView</name>
 	</types>
 	<types>
 		<members>Data_Manager_Admin</members>
