@@ -5,7 +5,7 @@ on:
     types: [closed]
     paths:
       - 'force-app/**'
-
+      
 name: Deploy SFDX Hardis
 jobs:
   prod_deploy:
@@ -49,33 +49,33 @@ jobs:
     - name: Install SFDX and plugins
       run: |
         npm install --no-cache @salesforce/cli --global
-        echo 'y' | sfdx plugins:install sfdx-git-delta
-        echo 'y' | sfdx plugins:install sfdx-hardis
+        echo 'y' | sf plugins:install sfdx-git-delta
+        echo 'y' | sf plugins:install sfdx-hardis
     # Calculate delta and set package.xml = delta.xml to deploy only delta changes
-    - name: Configure delta changes for sfdx-hardis and Destructives
+    - name: Calculate delta changes and destructive
       run: |
         mkdir changed-sources
-        sfdx sgd:source:delta --to "HEAD" --from "HEAD^" --output changed-sources/ --generate-delta --source force-app/
+        sf sgd:source:delta --to "HEAD" --from "HEAD^" --output changed-sources/ --generate-delta --source force-app/
         echo $(cat changed-sources/package/package.xml) > manifest/package.xml
         DESTRUCTIVE=$(cat changed-sources/destructiveChanges/destructiveChanges.xml | tr -d '[:space:]''?'\''/\\')       
         echo "DESTRUCTIVE_PACKAGE=$DESTRUCTIVE" >> $GITHUB_ENV
     #login
     - name: Salesforce Authentication
       run:
-        sfdx hardis:auth:login
+        sf hardis:auth:login
     # Deploy runnning All Tests
     - name: Deploy delta - All Tests
       if: ${{env.APEX_TESTS == 'all'}}
       run:
-        sfdx hardis:project:deploy:sources:dx
+        sf hardis:project:deploy:smart --testlevel RunLocalTests
     # Deploy runnning Selected Tests
     - name: Deploy delta - Selected Tests
       if: ${{env.APEX_TESTS != 'all'}}
       run:
-        sfdx hardis:project:deploy:sources:dx -l RunSpecifiedTests -r ${{env.APEX_TESTS}}
+        sf hardis:project:deploy:smart --testlevel RunSpecifiedTests -r ${{env.APEX_TESTS}}
     # Separate async destructive deploy   
     - name: 'Deploy destructive changes (if any)'
       if: contains(env.DESTRUCTIVE_PACKAGE, '<types>')
       run: |
         cat changed-sources/destructiveChanges/destructiveChanges.xml
-        sfdx force:mdapi:deploy -d "changed-sources/destructiveChanges" --ignorewarnings
+        sf project deploy start --async --pre-destructive-changes changed-sources/destructiveChanges/destructiveChanges.xml --manifest changed-sources/destructiveChanges/package.xml --ignore-warnings

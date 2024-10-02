@@ -15,7 +15,6 @@ public without sharing class BulkManageDataAction {
         if (sObjectType == null) {
             throw new IllegalArgumentException('Object not found: ' + objectName);
         }
-
         Schema.DescribeSObjectResult describeSObjectResult = sObjectType.getDescribe();
         
         // Get the list of fields for the object

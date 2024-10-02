@@ -16,7 +16,10 @@ async function extractTests(){
         //special delimeter for apex tests
         if(line.includes('Apex::[') && line.includes(']::Apex')){
 
-            let tests = line.substring(8,line.length-7).replaceAll("]","");
+            let tests = line.substring(8, line.length - 7).replaceAll("]", "").replaceAll(","," ");
+            if(tests != 'all'){// Add double quotes around test classes to run
+                tests = `"${tests}"`;
+            }
             await fs.promises.writeFile(testsFile,tests);
             await fs.promises.appendFile(testsFile,'\n');
         }
