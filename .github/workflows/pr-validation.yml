@@ -49,21 +49,21 @@ jobs:
     - name: Install SFDX and plugins
       run: |
         npm install --no-cache @salesforce/cli --global
-        echo 'y' | sfdx plugins:install sfdx-git-delta
-        echo 'y' | sfdx plugins:install @salesforce/sfdx-scanner
-        echo 'y' | sfdx plugins:install sfdx-hardis
+        echo 'y' | sf plugins:install sfdx-git-delta
+        echo 'y' | sf plugins:install @salesforce/sfdx-scanner
+        echo 'y' | sf plugins:install sfdx-hardis
     # Calculate delta (set package.xml = delta.xml) to deploy only delta changes and set destructive
     - name: Configure delta changes and destructive
       run: |
         mkdir changed-sources
-        sfdx sgd:source:delta --to "HEAD" --from "HEAD^" --output changed-sources/ --generate-delta --source force-app/
+        sf sgd:source:delta --to "HEAD" --from "HEAD^" --output changed-sources/ --generate-delta --source force-app/
         echo $(cat changed-sources/package/package.xml) > manifest/package.xml
         DESTRUCTIVE=$(cat changed-sources/destructiveChanges/destructiveChanges.xml | tr -d '[:space:]''?'\''/\\')       
         echo "DESTRUCTIVE_PACKAGE=$DESTRUCTIVE" >> $GITHUB_ENV
     # Scanner
     - name: 'Scan code'
       run: |
-        sfdx scanner:run --format sarif --target './**/*.cls' --category "Design,Best Practices,Performance" --outfile 'apexScanResults.sarif'  
+        sf scanner:run --format sarif --target './**/*.cls' --category "Design,Best Practices,Performance" --outfile 'apexScanResults.sarif'  
     - name: Upload SARIF file
       uses: github/codeql-action/upload-sarif@v3
       with:
@@ -71,20 +71,20 @@ jobs:
     #login
     - name: Salesforce Authentication
       run:
-        sfdx hardis:auth:login
+        sf hardis:auth:login
     # Check deploy runnning All Tests
     - name: Simulate delta deployment - All Tests
       if: ${{env.APEX_TESTS == 'all'}}
       run:
-        sfdx hardis:project:deploy:sources:dx -c
+        sf hardis:project:deploy:smart --check --testlevel RunLocalTests
     # Check deploy runnning Selected Tests
     - name: Simulate delta deployment - Selected Tests
       if: ${{env.APEX_TESTS != 'all'}}
       run:
-        sfdx hardis:project:deploy:sources:dx -c -l RunSpecifiedTests -r ${{env.APEX_TESTS}}
+        sf hardis:project:deploy:smart --check --testlevel RunSpecifiedTests -r ${{env.APEX_TESTS}}
     # Separate async destructive    
     - name: 'Check destructive changes (if any)'
       if: contains(env.DESTRUCTIVE_PACKAGE, '<types>')
       run: |
         cat changed-sources/destructiveChanges/destructiveChanges.xml
-        sfdx force:mdapi:deploy -d "changed-sources/destructiveChanges" --checkonly --ignorewarnings
+        sf project deploy start --dry-run --async --pre-destructive-changes changed-sources/destructiveChanges/destructiveChanges.xml --manifest changed-sources/destructiveChanges/package.xml --ignore-warnings
