@@ -71,6 +71,10 @@ export default class bulkManageDataMain extends LightningElement {
       }
   }
 
+  get disableOperationButton(){
+    return !this.objectName || this.finished;
+  }
+
   get processRecordsButtonLabel() {
     return this.operationType || '';
   }
