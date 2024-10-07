@@ -5,14 +5,13 @@
 	</template>
 	
 	<lightning-card title="Bulk Manage Records By Pasting Data from Excel">
-
 		<template lwc:if={data}>
 			<div class="slds-grid slds-wrap">
 				<div class="slds-col slds-large-size_2-of-12 slds-medium-size_2-of-12 slds-size_3-of-12 slds-var-p-around_xx-small">
 					<lightning-combobox name="Object" label="Object" value={objectName} placeholder="Select Object" options={objectOptions} onchange={handleObjectChange} disabled={finished}></lightning-combobox>
 				</div>
-				<div class="slds-col slds-large-size_2-of-12 slds-medium-size_2-of-12 slds-size_3-of-12 slds-var-p-around_xx-small">
-					<lightning-combobox name="OperationType" label="Operation" value={operationType} placeholder="Select Operation Type" options={operationOptions} onchange={handleOperationChange} disabled={finished} ></lightning-combobox>
+				<div class="slds-col slds-large-size_2-of-12 slds-medium-size_2-of-12 slds-size_3-of-12 slds-var-p-around_xx-small"> 
+					<lightning-combobox name="OperationType" label="Operation" value={operationType} placeholder="Select Operation Type" options={operationOptions} onchange={handleOperationChange} disabled={disableOperationButton} ></lightning-combobox>
 				</div>
 				<div class="slds-col slds-large-size_1-of-12 slds-medium-size_2-of-12 slds-size_3-of-12 slds-var-p-around_xx-small">
 					<lightning-input disabled={finished} type="number" label="chunk Size" name="chunkSize" max="200" min="1" formatter="number" step="1" value={chunkSize} required field-level-help="Define the number of records that will be processed in each batch when handling large datasets. This is particularly useful to avoid hitting limits or timeouts when working with a large number of records in Salesforce."  onchange={changeChunkSizeHandler}></lightning-input>
